@@ -1,0 +1,24 @@
+{
+  "name": "yoobu-logistic-batch",
+  "version": "1.0.0",
+  "description": "Le batch  de sycronisation de la base de donnee wp_yoobu et celle de la logistique",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node build/index.js",
+    "test": "test"
+  },
+  "keywords": [
+    "yoobu"
+  ],
+  "author": "SaminaTech",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
+}
