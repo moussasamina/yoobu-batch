@@ -30,7 +30,7 @@ dotenv.config();
       
       return responseData;
     } catch (error) {
-      console.error('Erreur lors de l\'appel API:', error);
+      console.error("Erreur lors de l appel API:", error);
       throw error;
     }
   }
@@ -60,3 +60,5 @@ dotenv.config();
   }
   
   main();
+
+  
