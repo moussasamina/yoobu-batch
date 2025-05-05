@@ -20,7 +20,7 @@ cd yoobu-logistic-batch
 2. **Installer les dépendances**
 
 ```bash
-npm ci # or npm install
+npm i # or npm ci
 ```
 
 ## 🛠️ Build (Compilation TypeScript)
