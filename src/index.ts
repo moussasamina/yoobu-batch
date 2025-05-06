@@ -53,6 +53,7 @@ async function main() {
     console.log("Success:", result);
   } catch (error) {
     console.error("Failed:", error);
+    process.exit(1);
   }
 }
 

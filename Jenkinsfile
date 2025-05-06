@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // SAMINA_LOGISTIC_API_URL = credentials('samina-logistic-api-url')
-        SAMINA_LOGISTIC_API_URL = '127.0.0.1:3001'
+        SAMINA_LOGISTIC_API_URL = credentials('samina-logistic-api-url')
     }
 
     stages {
