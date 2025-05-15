@@ -27,7 +27,7 @@ pipeline {
         stage('Build') {
             steps {
                 bat '''
-                    echo YOOBU_LOGISTIC_API_URL=http://%SAMINA_LOGISTIC_API_URL%/api/sync-db > .env
+                    echo YOOBU_LOGISTIC_API_URL=%SAMINA_LOGISTIC_API_URL%/api/sync-db > .env
                     npm run build
                 '''
             }
