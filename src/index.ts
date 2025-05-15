@@ -45,7 +45,7 @@ async function main() {
     };
 
     console.log("Sync db started...");
-    const url = process.env.YOOBU_LOGISTIC_API_URL || "";
+    const url = (process.env.YOOBU_LOGISTIC_API_URL || "") + "/api/sync-db";
     const result = await syncDatabaseYoobuLogistic(url, clientCred, {
       "API-KEY": "api-key-here",
     });
