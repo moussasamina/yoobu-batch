@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        SAMINA_LOGISTIC_API_URL = credentials('samina-logistic-api-url')
+        YB_WP_DB_URL = credentials('wp-db-url')
+        YB_LOGISTIC_DB_URL = credentials('logistic-db-url')
     }
 
     stages {
@@ -27,14 +28,13 @@ pipeline {
         stage('Build') {
             steps {
                 bat '''
-                    echo YOOBU_LOGISTIC_API_URL=http://%SAMINA_LOGISTIC_API_URL%/api/sync-db > .env
                     npm run build
                 '''
             }
         }
         stage('Process') {
             steps {
-                bat 'npm start'
+                bat 'npm run sync:db'
             }
         }
     }
