@@ -28,6 +28,10 @@ pipeline {
         stage('Build') {
             steps {
                 bat '''
+<<<<<<< HEAD
+=======
+                    echo YOOBU_LOGISTIC_API_URL=%SAMINA_LOGISTIC_API_URL%/ > .env
+>>>>>>> 7b846048d56ba0603a2ddd21a9864726d299b881
                     npm run build
                 '''
             }
