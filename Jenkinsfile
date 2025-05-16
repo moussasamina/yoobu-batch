@@ -7,14 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git(
-                    branch: 'main',
-                    url: 'https://github.com/codeangel223/batch-sync-yb-db.git'
-                )
-            }
-        }
         stage('Install') {
             steps {
                 bat 'npm install'
