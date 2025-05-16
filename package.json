@@ -1,10 +1,14 @@
 {
   "name": "yoobu-logistic-batch",
   "version": "1.0.0",
+  "type": "module",
   "description": "Le batch  de sycronisation de la base de donnee wp_yoobu et celle de la logistique",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc",
+    "postinstall": "npm run generate",
+    "generate": "npx prisma generate --schema db/prisma_yb_logistic/schema.prisma && npx prisma generate --schema db/prisma_yb_wp/schema.prisma",
+    "build": "tsc && cp -r src/generated build/generated",
+    "sync:db": "node build/sync-db.js",
     "start": "node build/index.js",
     "test": "test"
   },
@@ -15,10 +19,12 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.14.1",
+    "prisma": "^6.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.1",
     "dotenv": "^16.5.0"
   }
 }

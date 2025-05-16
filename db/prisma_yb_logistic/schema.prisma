@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../src/generated/prisma_yb_logistic"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("YB_LOGISTIC_DB_URL") // La base de donnee de Logistic
+}
+
+model addresse_adr {
+  adr_id           BigInt      @id @default(autoincrement())
+  adr_address_type String?     @db.VarChar(20)
+  adr_first_name   String?     @db.Text
+  adr_last_name    String?     @db.Text
+  adr_company      String?     @db.Text
+  adr_address_1    String?     @db.Text
+  adr_address_2    String?     @db.Text
+  adr_city         String?     @db.Text
+  adr_state        String?     @db.Text
+  adr_postcode     String?     @db.Text
+  adr_country      String?     @db.Text
+  adr_email        String?     @db.VarChar(320)
+  adr_phone        String?     @db.VarChar(100)
+  orders_ord       orders_ord?
+}
+
+model colis_col {
+  col_id                  String                            @id
+  ctm_typeconditionnement colis_col_ctm_typeconditionnement @default(CARTON)
+  col_delivery_date       DateTime?                         @db.DateTime(0)
+  col_current_status      colis_col_col_current_status?
+  col_order_id            BigInt
+  orders_ord              orders_ord                        @relation(fields: [col_order_id], references: [ord_order_id], onDelete: Cascade)
+  colisitems_ctm          colisitems_ctm[]
+  qrcode_qrc              qrcode_qrc?
+
+  @@index([col_order_id], map: "colis_col_col_order_id_fkey")
+}
+
+model colisitems_ctm {
+  ctm_id          String          @id
+  ctm_col_id      String
+  ctm_prd_id      BigInt
+  ctm_prod_count  Int
+  colis_col       colis_col       @relation(fields: [ctm_col_id], references: [col_id], onDelete: Cascade)
+  ordersitems_ori ordersitems_ori @relation(fields: [ctm_prd_id], references: [ori_itm_id], onDelete: Cascade)
+
+  @@index([ctm_col_id], map: "colisitems_ctm_ctm_col_id_fkey")
+  @@index([ctm_prd_id], map: "colisitems_ctm_ctm_prd_id_fkey")
+}
+
+model orders_ord {
+  ord_id            BigInt                       @id @default(autoincrement())
+  ord_order_id      BigInt                       @unique
+  ord_seller_id     BigInt
+  ord_order_total   Decimal?                     @db.Decimal(19, 4)
+  ord_net_amount    Decimal?                     @db.Decimal(19, 4)
+  ord_order_status  String?                      @db.VarChar(30)
+  ord_adr_id        BigInt?                      @unique
+  ord_delivery_date DateTime?
+  ord_globalstatus  orders_ord_ord_globalstatus?
+  colis_col         colis_col[]
+  addresse_adr      addresse_adr?                @relation(fields: [ord_adr_id], references: [adr_id])
+  ordersitems_ori   ordersitems_ori[]
+
+  @@index([ord_order_id], map: "ord_order_id")
+}
+
+model ordersitems_ori {
+  ori_itm_id           BigInt           @id
+  ori_itm_product_name String
+  ori_itm_count        Int?
+  ori_itm_order_id     BigInt?
+  ori_itm_product_id   BigInt?
+  colisitems_ctm       colisitems_ctm[]
+  orders_ord           orders_ord?      @relation(fields: [ori_itm_order_id], references: [ord_order_id], onDelete: Cascade)
+
+  @@index([ori_itm_order_id], map: "ordersitems_ori_ori_itm_order_id_fkey")
+}
+
+model qrcode_qrc {
+  qrc_id        String     @id @unique @db.VarChar(50)
+  qrc_secretkey String?    @db.Text
+  qrc_coli_id   String     @unique(map: "qrc_coli_id") @db.VarChar(50)
+  colis_col     colis_col  @relation(fields: [qrc_coli_id], references: [col_id], onDelete: Cascade)
+  scan_scn      scan_scn[]
+}
+
+model scan_scn {
+  scn_id        String     @id @unique @db.VarChar(50)
+  scn_date      DateTime?  @db.DateTime(0)
+  scn_zon       String?    @db.VarChar(50)
+  scn_user_id   String?    @db.VarChar(50)
+  scn_qrcode_id String     @db.VarChar(50)
+  qrcode_qrc    qrcode_qrc @relation(fields: [scn_qrcode_id], references: [qrc_id])
+
+  @@index([scn_qrcode_id], map: "scan_scn_scn_qrcode_id_fkey")
+  @@index([scn_user_id], map: "scn_user_id")
+}
+
+model users_usr {
+  usr_id        String              @id @unique(map: "usr_id")
+  usr_zon_id    String?             @db.VarChar(50)
+  usr_firstname String?             @db.VarChar(50)
+  usr_lastname  String?             @db.VarChar(50)
+  usr_email     String?             @unique @db.VarChar(50)
+  usr_role      users_usr_usr_role?
+}
+
+model zone_zon {
+  zon_id          Int     @id @unique(map: "zon_id") @default(autoincrement())
+  zon_code        String? @db.VarChar(50)
+  zon_designation String? @db.VarChar(50)
+}
+
+enum colis_col_ctm_typeconditionnement {
+  CARTON
+  PAQUET
+  SACHET
+}
+
+enum colis_col_col_current_status {
+  PREPARATION_EN_COURS
+  PARTIELLEMENT_PREPAREE
+  PREPAREE
+  LIVRAISON_EN_COURS
+  PARTIELLEMENT_LIVREE
+  LIVREE
+  A_RELIVRER
+}
+
+enum users_usr_usr_role {
+  PREPARATEUR
+  LIVREUR
+  LOGISTICIEN
+}
+
+enum orders_ord_ord_globalstatus {
+  PREPARATION_EN_COURS
+  PARTIELLEMENT_PREPAREE
+  PREPAREE
+  LIVRAISON_EN_COURS
+  PARTIELLEMENT_LIVREE
+  LIVREE
+}
