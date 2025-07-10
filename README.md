@@ -121,7 +121,7 @@ Ce script :
 
 ---
 
-## 📌 Scripts utiles
+## 📌 Scripts utiless
 
 | Script               | Description                                 |
 | -------------------- | ------------------------------------------- |
