@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("YB_LOGISTIC_DB_URL") // La base de donnee de Logistic
+  url      = env("YB_LOGISTIC_DB_URL")
 }
 
 model addresse_adr {
@@ -26,28 +26,32 @@ model addresse_adr {
 }
 
 model colis_col {
-  col_id                  String                            @id
-  ctm_typeconditionnement colis_col_ctm_typeconditionnement @default(CARTON)
-  col_delivery_date       DateTime?                         @db.DateTime(0)
+  col_id                  String                        @id
+  col_delivery_date       DateTime?                     @db.DateTime(0)
   col_current_status      colis_col_col_current_status?
   col_order_id            BigInt
-  orders_ord              orders_ord                        @relation(fields: [col_order_id], references: [ord_order_id], onDelete: Cascade)
+  col_track_number        String?                       @unique
+  col_number              String?                       @unique
+  col_tyc_id              Int?
+  orders_ord              orders_ord                    @relation(fields: [col_order_id], references: [ord_order_id], onDelete: Cascade)
+  typeconditionnement_tyc typeconditionnement_tyc?      @relation(fields: [col_tyc_id], references: [tyc_id], onDelete: Cascade)
   colisitems_ctm          colisitems_ctm[]
   qrcode_qrc              qrcode_qrc?
 
   @@index([col_order_id], map: "colis_col_col_order_id_fkey")
+  @@index([col_tyc_id], map: "colis_col_col_tyc_id_fkey")
 }
 
 model colisitems_ctm {
   ctm_id          String          @id
   ctm_col_id      String
-  ctm_prd_id      BigInt
+  ctm_ori_itm_id  BigInt
   ctm_prod_count  Int
   colis_col       colis_col       @relation(fields: [ctm_col_id], references: [col_id], onDelete: Cascade)
-  ordersitems_ori ordersitems_ori @relation(fields: [ctm_prd_id], references: [ori_itm_id], onDelete: Cascade)
+  ordersitems_ori ordersitems_ori @relation(fields: [ctm_ori_itm_id], references: [ori_itm_id], onDelete: Cascade)
 
   @@index([ctm_col_id], map: "colisitems_ctm_ctm_col_id_fkey")
-  @@index([ctm_prd_id], map: "colisitems_ctm_ctm_prd_id_fkey")
+  @@index([ctm_ori_itm_id], map: "colisitems_ctm_ctm_ori_itm_id_fkey")
 }
 
 model orders_ord {
@@ -101,6 +105,7 @@ model scan_scn {
 
 model users_usr {
   usr_id        String              @id @unique(map: "usr_id")
+  usr_active    Boolean             @default(true)
   usr_zon_id    String?             @db.VarChar(50)
   usr_firstname String?             @db.VarChar(50)
   usr_lastname  String?             @db.VarChar(50)
@@ -114,20 +119,15 @@ model zone_zon {
   zon_designation String? @db.VarChar(50)
 }
 
-enum colis_col_ctm_typeconditionnement {
-  CARTON
-  PAQUET
-  SACHET
-}
-
-enum colis_col_col_current_status {
-  PREPARATION_EN_COURS
-  PARTIELLEMENT_PREPAREE
-  PREPAREE
-  LIVRAISON_EN_COURS
-  PARTIELLEMENT_LIVREE
-  LIVREE
-  A_RELIVRER
+model typeconditionnement_tyc {
+  tyc_id          Int         @id @unique @default(autoincrement())
+  tyc_code        String
+  tyc_designation String
+  tyc_largeur     Decimal
+  tyc_longueur    Decimal
+  tyc_poids       Decimal
+  tyc_hauteur     Decimal
+  colis_col       colis_col[]
 }
 
 enum users_usr_usr_role {
@@ -136,11 +136,22 @@ enum users_usr_usr_role {
   LOGISTICIEN
 }
 
+enum colis_col_col_current_status {
+  PREPARATION_EN_COURS
+  PARTIELLEMENT_PREPAREE
+  PREPAREE
+  LIVRAISON_EN_COURS
+  PARTIELLEMENT_LIVREE
+  A_RELIVRER
+  LIVREE
+}
+
 enum orders_ord_ord_globalstatus {
   PREPARATION_EN_COURS
   PARTIELLEMENT_PREPAREE
   PREPAREE
   LIVRAISON_EN_COURS
   PARTIELLEMENT_LIVREE
+  A_RELIVRER
   LIVREE
 }
