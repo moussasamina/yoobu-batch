@@ -28,13 +28,13 @@ model addresse_adr {
 model colis_col {
   col_id                  String                        @id
   col_delivery_date       DateTime?                     @db.DateTime(0)
-  col_current_status      colis_col_col_current_status?
+  col_current_status      colis_col_col_current_status? @default(NON_PREPAREE)
   col_order_id            BigInt
   col_track_number        String?                       @unique
   col_number              String?                       @unique
   col_tyc_id              Int?
   orders_ord              orders_ord                    @relation(fields: [col_order_id], references: [ord_order_id], onDelete: Cascade)
-  typeconditionnement_tyc typeconditionnement_tyc?      @relation(fields: [col_tyc_id], references: [tyc_id], onDelete: Cascade)
+  typeconditionnement_tyc typeconditionnement_tyc?      @relation(fields: [col_tyc_id], references: [tyc_id])
   colisitems_ctm          colisitems_ctm[]
   qrcode_qrc              qrcode_qrc?
 
@@ -63,6 +63,7 @@ model orders_ord {
   ord_order_status  String?                      @db.VarChar(30)
   ord_adr_id        BigInt?                      @unique
   ord_delivery_date DateTime?
+  ord_create_at     DateTime?
   ord_globalstatus  orders_ord_ord_globalstatus?
   colis_col         colis_col[]
   addresse_adr      addresse_adr?                @relation(fields: [ord_adr_id], references: [adr_id])
@@ -137,6 +138,7 @@ enum users_usr_usr_role {
 }
 
 enum colis_col_col_current_status {
+  NON_PREPAREE
   PREPARATION_EN_COURS
   PARTIELLEMENT_PREPAREE
   PREPAREE
@@ -147,6 +149,7 @@ enum colis_col_col_current_status {
 }
 
 enum orders_ord_ord_globalstatus {
+  NON_PREPAREE
   PREPARATION_EN_COURS
   PARTIELLEMENT_PREPAREE
   PREPAREE

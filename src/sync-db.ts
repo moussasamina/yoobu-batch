@@ -60,18 +60,27 @@ async function main() {
         })
       );
 
+      const o = await prisma_yb_wp.wp_wc_orders.findUnique({
+        where: {
+          id: Number(wpOrder.order_id),
+        },
+      });
+      const created_at = o?.date_created_gmt;
+
       if (!existingOrder) {
         metadata["count_created"] += 1;
         metadata["created_ids"].push({
           id: Number(wpOrder?.id),
           order_id: Number(wpOrder.order_id),
         });
+
         await prisma_yb_logistic.orders_ord.create({
           data: {
             ord_id: wpOrder.id,
             ord_order_id: wpOrder.order_id!,
             ord_seller_id: wpOrder.seller_id!,
             ord_order_status: wpOrder.order_status,
+            ord_create_at: created_at,
             ord_net_amount: wpOrder.net_amount,
             ord_order_total: wpOrder.order_total,
             ordersitems_ori: {
@@ -119,6 +128,7 @@ async function main() {
           data: {
             ord_order_id: wpOrder.order_id!,
             ord_seller_id: wpOrder.seller_id!,
+            ord_create_at: created_at,
             ord_order_status: wpOrder.order_status,
             ord_net_amount: wpOrder.net_amount,
             ord_order_total: wpOrder.order_total,
